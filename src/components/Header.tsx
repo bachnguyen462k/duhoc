@@ -6,7 +6,7 @@ interface HeaderProps {
   activePage: ActivePage;
   setActivePage: (page: ActivePage) => void;
   onOpenConsultModal: () => void;
-  onOpenCalculator: () => void;
+  onOpenCalculator?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -79,16 +79,6 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="text-[13px] text-slate-900 dark:text-[#d6e3ff] font-bold leading-tight">1900 6868</span>
             </div>
           </a>
-
-          {/* Quick Calculator Button */}
-          <button
-            onClick={onOpenCalculator}
-            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 dark:bg-[#1c2a41] dark:text-[#4cd7f6] dark:hover:bg-[#27354c] dark:hover:text-[#acedff] dark:border-[#4cd7f6]/20 transition-all text-[13px] font-semibold shadow-sm cursor-pointer whitespace-nowrap"
-            id="quick-calc-btn"
-          >
-            <span className="material-symbols-outlined text-[17px]">calculate</span>
-            <span>Dự Đoán Tỷ Lệ Đỗ</span>
-          </button>
 
           {/* Consultation CTA */}
           <button
@@ -188,17 +178,6 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           ))}
           <div className="pt-3 border-t border-slate-200 dark:border-[#1c2a41] flex flex-col gap-2.5">
-            <button
-              onClick={() => {
-                onOpenCalculator();
-                setIsMobileMenuOpen(false);
-              }}
-              className="w-full py-3 rounded-xl bg-blue-50 dark:bg-[#1c2a41] text-blue-700 dark:text-[#4cd7f6] text-[13px] font-bold text-center flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[20px]">calculate</span>
-              <span>Dự Đoán Tỷ Lệ Đỗ &amp; Chi Phí</span>
-            </button>
-
             <button
               onClick={() => {
                 toggleTheme();
