@@ -254,18 +254,33 @@ export const ThreeGlobe: React.FC<ThreeGlobeProps> = ({ focusedCountry = 'japan'
         ctx.stroke();
       });
 
-      // Add high-density golden & cyan dots on Vietnam, Taiwan, Korea, and Japan
+      // Add glowing gateway dots across all continents on Earth
       ctx.fillStyle = '#ffb95f';
       [
+        // East Asia & Southeast Asia
         { lat: 21.0, lon: 105.8 }, // VN Hanoi
         { lat: 10.8, lon: 106.6 }, // VN HCMC
         { lat: 25.0, lon: 121.5 }, // Taiwan
         { lat: 37.5, lon: 126.9 }, // Korea
-        { lat: 35.7, lon: 139.7 }  // Japan
+        { lat: 35.7, lon: 139.7 }, // Japan
+        { lat: 1.35, lon: 103.8 }, // Singapore
+        // Europe & Middle East & Africa
+        { lat: 51.5, lon: -0.1 },  // London
+        { lat: 50.1, lon: 8.7 },   // Frankfurt
+        { lat: 48.9, lon: 2.4 },   // Paris
+        { lat: 25.2, lon: 55.3 },  // Dubai
+        { lat: 30.0, lon: 31.2 },  // Cairo
+        { lat: -26.2, lon: 28.0 }, // Johannesburg
+        // Americas & Oceania
+        { lat: 40.7, lon: -74.0 }, // New York
+        { lat: 34.0, lon: -118.2 },// Los Angeles
+        { lat: 49.3, lon: -123.1 },// Vancouver
+        { lat: -23.5, lon: -46.6 },// São Paulo
+        { lat: -33.9, lon: 151.2 } // Sydney
       ].forEach((p) => {
         const { x, y } = toCanvasCoords(p.lat, p.lon);
         ctx.beginPath();
-        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
         ctx.fill();
       });
     }
@@ -297,28 +312,32 @@ export const ThreeGlobe: React.FC<ThreeGlobeProps> = ({ focusedCountry = 'japan'
     const haloMesh = new THREE.Mesh(haloGeo, haloMat);
     globeGroup.add(haloMesh);
 
-    // 4. Dot Cloud on Earth Landmasses (High Tech Academic Dots)
+    // 4. Dot Cloud on Earth Landmasses (Evenly distributed across all continents)
     const dotCount = 650;
     const dotGeo = new THREE.BufferGeometry();
     const dotPositions = new Float32Array(dotCount * 3);
     const dotColors = new Float32Array(dotCount * 3);
 
     for (let i = 0; i < dotCount; i++) {
-      // Concentrate more points in the Asian Pacific corridor
+      // Evenly distribute academic points across all 5 major world regions
       const u = Math.random();
       let lat = 0;
       let lon = 0;
 
-      if (u < 0.55) {
-        // East Asia & Southeast Asia corridor
-        lat = 5 + Math.random() * 45;
-        lon = 95 + Math.random() * 55;
+      if (u < 0.25) {
+        // Asia & Southeast Asia
+        lat = 5 + Math.random() * 50;
+        lon = 75 + Math.random() * 75;
+      } else if (u < 0.50) {
+        // Europe, Middle East & Africa
+        lat = -30 + Math.random() * 85;
+        lon = -15 + Math.random() * 75;
       } else if (u < 0.75) {
-        // Eurasia & Europe
-        lat = 30 + Math.random() * 35;
-        lon = -10 + Math.random() * 60;
+        // Americas (North, Central & South America)
+        lat = -45 + Math.random() * 105;
+        lon = -130 + Math.random() * 95;
       } else {
-        // Americas & Pacific
+        // Oceania, Pacific & Global Oceans
         lat = (Math.random() - 0.5) * 110;
         lon = (Math.random() - 0.5) * 360;
       }
@@ -607,30 +626,51 @@ export const ThreeGlobe: React.FC<ThreeGlobeProps> = ({ focusedCountry = 'japan'
       }
     }
 
-    // B. Arced Point-to-Point Flight Routes (Tuyến bay cất cánh từ các Hub)
+    // B. Arced Point-to-Point Flight Routes (Tuyến bay cất cánh từ các Hub toàn cầu)
     function createFlightArc(
       p1: { lat: number; lon: number },
       p2: { lat: number; lon: number },
       colorHex: number,
-      arcHeight = 0.35,
-      flightSpeed = 0.32
+      arcHeight = 0.38,
+      flightSpeed = 0.045,
+      offset = Math.random()
     ) {
       const v1 = latLngToVector3(p1.lat, p1.lon, GLOBE_RADIUS);
       const v2 = latLngToVector3(p2.lat, p2.lon, GLOBE_RADIUS);
+      const angle = v1.angleTo(v2);
 
-      const mid = new THREE.Vector3().addVectors(v1, v2).multiplyScalar(0.5);
-      const dist = v1.distanceTo(v2);
-      mid.normalize().multiplyScalar(GLOBE_RADIUS + dist * 0.38 + arcHeight);
+      const numPoints = 48;
+      const points: THREE.Vector3[] = [];
+      for (let i = 0; i <= numPoints; i++) {
+        const t = i / numPoints;
+        let pt: THREE.Vector3;
+        if (angle < 0.001) {
+          pt = v1.clone();
+        } else {
+          // Spherical linear interpolation (SLERP) across 3D spherical Earth
+          const sinAngle = Math.sin(angle);
+          const w1 = Math.sin((1 - t) * angle) / sinAngle;
+          const w2 = Math.sin(t * angle) / sinAngle;
+          pt = new THREE.Vector3(
+            w1 * v1.x + w2 * v2.x,
+            w1 * v1.y + w2 * v2.y,
+            w1 * v1.z + w2 * v2.z
+          );
+        }
+        // Parabolic arc height above spherical surface
+        const altitude = GLOBE_RADIUS + Math.sin(t * Math.PI) * (arcHeight + angle * 0.08);
+        pt.normalize().multiplyScalar(altitude);
+        points.push(pt);
+      }
 
-      const curve = new THREE.QuadraticBezierCurve3(v1, mid, v2);
-      const points = curve.getPoints(50);
-      const curveGeo = new THREE.BufferGeometry().setFromPoints(points);
+      const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
+      const curveGeo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(48));
 
       const curveMat = new THREE.LineBasicMaterial({
         color: colorHex,
         transparent: true,
-        opacity: isDark ? 0.85 : 0.95,
-        linewidth: 2
+        opacity: isDark ? 0.75 : 0.88,
+        linewidth: 1.8
       });
       const arcMesh = new THREE.Line(curveGeo, curveMat);
       globeGroup.add(arcMesh);
@@ -644,53 +684,141 @@ export const ThreeGlobe: React.FC<ThreeGlobeProps> = ({ focusedCountry = 'japan'
         mesh: arcMesh,
         airplane,
         speed: flightSpeed,
-        offset: Math.random()
+        offset
       });
     }
 
-    const vnHub = hubs[0]; // Vietnam (Hanoi - HAN)
-    const twHub = hubs[1]; // Taiwan (Taipei - TPE)
-    const krHub = hubs[2]; // Korea (Seoul - ICN)
-    const jpHub = hubs[3]; // Japan (Tokyo - NRT)
+    // World Aviation Hubs across all continents for balanced global distribution
+    const gateways = {
+      // East Asia & Southeast Asia
+      hanoi: { lat: 21.0285, lon: 105.8542 },
+      hcmc: { lat: 10.8231, lon: 106.6297 },
+      danang: { lat: 16.0544, lon: 108.2022 },
+      tokyo: { lat: 35.6762, lon: 139.6503 },
+      seoul: { lat: 37.5665, lon: 126.9780 },
+      taipei: { lat: 25.0330, lon: 121.5654 },
+      singapore: { lat: 1.3521, lon: 103.8198 },
 
-    // 1. GLOBAL CIRCUMNAVIGATION ROUTES (Bay vòng quanh toàn cầu)
-    // Corridor 1: Trans-Pacific & Eurasian Main Route (Đường bay chính vòng quanh địa cầu qua Châu Á - Thái Bình Dương - Châu Mỹ - Châu Âu)
+      // Europe
+      london: { lat: 51.5074, lon: -0.1278 },
+      frankfurt: { lat: 50.1109, lon: 8.6821 },
+      paris: { lat: 48.8566, lon: 2.3522 },
+
+      // North America
+      newyork: { lat: 40.7128, lon: -74.0060 },
+      losangeles: { lat: 34.0522, lon: -118.2437 },
+      vancouver: { lat: 49.2827, lon: -123.1207 },
+
+      // South America
+      saopaulo: { lat: -23.5505, lon: -46.6333 },
+
+      // Middle East & Africa
+      dubai: { lat: 25.2048, lon: 55.2708 },
+      cairo: { lat: 30.0444, lon: 31.2357 },
+      johannesburg: { lat: -26.2041, lon: 28.0473 },
+
+      // Oceania
+      sydney: { lat: -33.8688, lon: 151.2093 }
+    };
+
+    // 1. GLOBAL 360-DEGREE PLANETARY ORBITS (Phân bố 8 máy bay tuần tra vòng quanh toàn cầu)
+    // Orbit 1: Trans-Pacific & Atlantic Inclined Orbit
     createGlobalCircumnavigationRoute(
       GLOBE_RADIUS + 0.36,
       new THREE.Euler(0.42, 0.22, -0.18),
-      0x38bdf8, // Sky Blue / Cyan
-      0.055,    // Tốc độ bay tuần tra quanh trái đất
+      0x38bdf8, // Sky Blue
+      0.038,
       2         // 2 máy bay cách nhau 180 độ
     );
 
-    // Corridor 2: Trans-Continental Southern & Northern Global Route (Vòng bay liên lục địa thứ hai tạo chiều sâu 3D đa góc)
+    // Orbit 2: Southern Hemisphere & Oceania / Africa Orbit
     createGlobalCircumnavigationRoute(
       GLOBE_RADIUS + 0.44,
       new THREE.Euler(-0.46, -0.32, 0.52),
       0x10b981, // Emerald Green
-      0.048,
-      2         // 2 máy bay
+      0.035,
+      2         // 2 máy bay cách nhau 180 độ
     );
 
-    // Corridor 3: High-Altitude Trans-Polar Global Express (Vòng bay cực qua Bắc bán cầu và Đông Á)
+    // Orbit 3: Trans-Polar High-Latitude Express
     createGlobalCircumnavigationRoute(
       GLOBE_RADIUS + 0.32,
       new THREE.Euler(0.72, 0.35, 0.12),
       0xf59e0b, // Amber Gold
-      0.062,
-      1         // 1 máy bay
+      0.042,
+      2         // 2 máy bay
     );
 
-    // 2. REGIONAL STUDY ABROAD & LABOR EXPORT FLIGHT ARCS (Tuyến bay trọng điểm xuất cảnh)
-    createFlightArc(vnHub, jpHub, 0x10b981, 0.48, 0.28);  // Hà Nội (HAN) ➔ Tokyo (NRT)
-    createFlightArc(vnHub, krHub, 0xf59e0b, 0.40, 0.30);  // Hà Nội (HAN) ➔ Seoul (ICN)
-    createFlightArc(vnHub, twHub, 0x38bdf8, 0.28, 0.34);  // Hà Nội (HAN) ➔ Đài Bắc (TPE)
-    createFlightArc(hcmc, jpHub, 0x10b981, 0.55, 0.26);   // TP.HCM (SGN) ➔ Tokyo (NRT)
-    createFlightArc(hcmc, krHub, 0xf59e0b, 0.46, 0.29);   // TP.HCM (SGN) ➔ Seoul (ICN)
-    createFlightArc(hcmc, twHub, 0x38bdf8, 0.34, 0.33);   // TP.HCM (SGN) ➔ Đài Bắc (TPE)
-    createFlightArc(danang, twHub, 0x818cf8, 0.30, 0.32); // Đà Nẵng (DAD) ➔ Đài Bắc (TPE)
-    createFlightArc(danang, jpHub, 0x22c55e, 0.48, 0.27); // Đà Nẵng (DAD) ➔ Tokyo (NRT)
-    createFlightArc(hcmc, vnHub, 0xef4444, 0.16, 0.40);   // TP.HCM ➔ Hà Nội (Nội địa)
+    // Orbit 4: Equatorial Global Orbit
+    createGlobalCircumnavigationRoute(
+      GLOBE_RADIUS + 0.40,
+      new THREE.Euler(0.06, 0.15, -0.04),
+      0x818cf8, // Indigo Blue
+      0.036,
+      2         // 2 máy bay
+    );
+
+    // 2. INTERCONTINENTAL FLIGHT ARCS (Chia đều máy bay khắp tất cả các lục địa và đại dương)
+    // Pacific Ocean (Châu Á ➔ Bắc Mỹ)
+    createFlightArc(gateways.tokyo, gateways.losangeles, 0x38bdf8, 0.42, 0.045, 0.15);
+    createFlightArc(gateways.vancouver, gateways.tokyo, 0x06b6d4, 0.40, 0.044, 0.75);
+
+    // Atlantic Ocean (Bắc Mỹ ➔ Châu Âu)
+    createFlightArc(gateways.newyork, gateways.london, 0x10b981, 0.35, 0.048, 0.45);
+
+    // Eurasia Corridor (Châu Âu ➔ Đông Á)
+    createFlightArc(gateways.frankfurt, gateways.seoul, 0xf59e0b, 0.42, 0.040, 0.65);
+
+    // Middle East & South Asia (Trung Đông ➔ Đông Nam Á)
+    createFlightArc(gateways.dubai, gateways.hanoi, 0x06b6d4, 0.36, 0.046, 0.30);
+    createFlightArc(gateways.paris, gateways.dubai, 0x818cf8, 0.32, 0.050, 0.60);
+
+    // Americas North-South (Bắc Mỹ ➔ Nam Mỹ)
+    createFlightArc(gateways.losangeles, gateways.saopaulo, 0xf87171, 0.44, 0.042, 0.20);
+
+    // Africa Corridor (Châu Phi Bắc ➔ Nam)
+    createFlightArc(gateways.cairo, gateways.johannesburg, 0xfbbf24, 0.38, 0.044, 0.55);
+
+    // Oceania to Asia (Châu Đại Dương ➔ Châu Á)
+    createFlightArc(gateways.sydney, gateways.singapore, 0x34d399, 0.36, 0.046, 0.80);
+
+    // South Atlantic (Nam Mỹ ➔ Châu Phi)
+    createFlightArc(gateways.saopaulo, gateways.johannesburg, 0x60a5fa, 0.40, 0.042, 0.38);
+
+    // 3. EDUGLOBAL REGIONAL CORRIDORS (Việt Nam ➔ Nhật Bản, Hàn Quốc, Đài Loan)
+    createFlightArc(gateways.hanoi, gateways.tokyo, 0x10b981, 0.35, 0.052, 0.10);  // Hà Nội ➔ Tokyo
+    createFlightArc(gateways.hcmc, gateways.seoul, 0xf59e0b, 0.36, 0.050, 0.40);   // TP.HCM ➔ Seoul
+    createFlightArc(gateways.danang, gateways.taipei, 0x38bdf8, 0.28, 0.056, 0.70); // Đà Nẵng ➔ Đài Bắc
+
+    // Subtle Gateway Beacon Spheres for World Cities
+    const secondaryGateways = [
+      gateways.london,
+      gateways.paris,
+      gateways.frankfurt,
+      gateways.newyork,
+      gateways.losangeles,
+      gateways.vancouver,
+      gateways.saopaulo,
+      gateways.dubai,
+      gateways.cairo,
+      gateways.johannesburg,
+      gateways.sydney,
+      gateways.singapore
+    ];
+
+    secondaryGateways.forEach((gw) => {
+      const pos = latLngToVector3(gw.lat, gw.lon, GLOBE_RADIUS + 0.02);
+      const beacon = new THREE.Mesh(
+        new THREE.SphereGeometry(0.04, 10, 10),
+        new THREE.MeshBasicMaterial({
+          color: isDark ? 0x38bdf8 : 0x0284c7,
+          transparent: true,
+          opacity: 0.85
+        })
+      );
+      beacon.position.copy(pos);
+      globeGroup.add(beacon);
+    });
 
     // 6. Hub Pins and Pulsing Ripple Rings for the 4 Countries
     interface PulsingRing {
