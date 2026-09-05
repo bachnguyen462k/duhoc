@@ -1,19 +1,42 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { NEWS_ARTICLES } from '../data/mockData';
 import { NewsArticle } from '../types';
 import { useTheme } from '../context/ThemeContext';
 
 interface NewsViewProps {
+  initialArticleId?: string | null;
   onOpenConsultModal?: (topic: string) => void;
   onNavigateHome?: () => void;
+  onViewRoadmap?: (countryId: string) => void;
 }
 
-export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNavigateHome }) => {
+export const NewsView: React.FC<NewsViewProps> = ({
+  initialArticleId,
+  onOpenConsultModal,
+  onNavigateHome,
+  onViewRoadmap
+}) => {
   const { isDark } = useTheme();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(() => {
+    if (initialArticleId) {
+      return NEWS_ARTICLES.find((a) => a.id === initialArticleId) || null;
+    }
+    return null;
+  });
   const [copiedNotification, setCopiedNotification] = useState<boolean>(false);
+
+  // Sync selectedArticle when initialArticleId prop changes
+  useEffect(() => {
+    if (initialArticleId) {
+      const article = NEWS_ARTICLES.find((a) => a.id === initialArticleId);
+      if (article) {
+        setSelectedArticle(article);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }, [initialArticleId]);
 
   const categories = [
     { id: 'all', label: 'Tất Cả Bài Viết', icon: 'apps' },
@@ -46,8 +69,14 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleShareArticle = () => {
-    navigator.clipboard?.writeText(window.location.href);
+  const handleShareArticle = async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(window.location.href);
+      }
+    } catch {
+      // Graceful fallback for sandbox iframe environment
+    }
     setCopiedNotification(true);
     setTimeout(() => setCopiedNotification(false), 2500);
   };
@@ -59,51 +88,98 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
     }
   };
 
+  // Helper to detect matching roadmap destination
+  const getDestinationForArticle = (article: NewsArticle) => {
+    const text = `${article.title} ${article.category} ${(article.tags || []).join(' ')}`.toLowerCase();
+    if (text.includes('nhật') || text.includes('tokutei') || text.includes('mext')) {
+      return { id: 'japan', name: 'Nhật Bản', flag: '🇯🇵', desc: 'Lộ trình Tokutei Ginou 1 & 2, Kỹ sư & Học bổng MEXT 100%' };
+    }
+    if (text.includes('hàn') || text.includes('e-7') || text.includes('gks')) {
+      return { id: 'korea', name: 'Hàn Quốc', flag: '🇰🇷', desc: 'Lộ trình Kỹ sư Đóng tàu E-7, Học bổng SKY & Du học D2/D4' };
+    }
+    if (text.includes('đài') || text.includes('tsmc') || text.includes('tân hướng nam')) {
+      return { id: 'taiwan', name: 'Đài Loan', flag: '🇹🇼', desc: 'Lộ trình Học bổng Bán dẫn TSMC, Công xưởng Kỹ thuật & Tân Hướng Nam' };
+    }
+    return null;
+  };
+
   // 1. DETAIL VIEW MODE
   if (selectedArticle) {
     const relatedArticles = NEWS_ARTICLES.filter(
       (a) => a.id !== selectedArticle.id && (a.category === selectedArticle.category || activeCategory === 'all')
     ).slice(0, 3);
 
+    const relatedRoadmap = getDestinationForArticle(selectedArticle);
+
     return (
-      <div className={`w-full pt-28 pb-20 transition-colors duration-300 ${
+      <div className={`w-full pt-28 pb-20 transition-colors duration-300 min-h-screen ${
         isDark ? 'bg-[#041329] text-[#c3c6d7]' : 'bg-[#f8fafc] text-slate-800'
       }`}>
-        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
           {/* Breadcrumb & Navigation Bar */}
-          <div className="flex items-center justify-between gap-4 py-4 mb-6 border-b border-white/10">
-            <button
-              onClick={handleBackToList}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                isDark
-                  ? 'bg-[#0d1c32] hover:bg-[#132644] text-[#4cd7f6] border border-[#1c2a41]'
-                  : 'bg-white hover:bg-slate-100 text-blue-600 border border-slate-200 shadow-sm'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-              <span>Quay Lại Danh Sách Tin Tức</span>
-            </button>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4 mb-6 border-b border-slate-200 dark:border-white/10">
+            {/* Breadcrumb Links */}
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 overflow-x-auto whitespace-nowrap pb-1 sm:pb-0">
+              {onNavigateHome && (
+                <>
+                  <button
+                    onClick={onNavigateHome}
+                    className="hover:text-blue-600 dark:hover:text-cyan-400 flex items-center gap-1 font-medium transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">home</span>
+                    <span>Trang Chủ</span>
+                  </button>
+                  <span>/</span>
+                </>
+              )}
+              <button
+                onClick={handleBackToList}
+                className="hover:text-blue-600 dark:hover:text-cyan-400 font-medium transition-colors"
+              >
+                Tin Tức &amp; Cẩm Nang
+              </button>
+              <span>/</span>
+              <span className="text-slate-800 dark:text-cyan-300 font-semibold truncate max-w-[180px] sm:max-w-[280px]">
+                {selectedArticle.title}
+              </span>
+            </div>
 
-            <div className="flex items-center gap-2">
+            {/* Quick Actions */}
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={handleBackToList}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                  isDark
+                    ? 'bg-[#0d1c32] hover:bg-[#132644] text-[#4cd7f6] border border-[#1c2a41]'
+                    : 'bg-white hover:bg-slate-100 text-blue-600 border border-slate-200 shadow-sm'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[16px] sm:text-[18px]">arrow_back</span>
+                <span className="hidden xs:inline">Quay lại danh sách</span>
+                <span className="xs:hidden">Quay lại</span>
+              </button>
+
               <button
                 onClick={handleShareArticle}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3 sm:py-2 rounded-xl text-xs font-semibold transition-all ${
                   isDark
                     ? 'bg-[#0d1c32] hover:bg-[#132644] text-slate-300 border border-[#1c2a41]'
                     : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 shadow-sm'
                 }`}
-                title="Sao chép liên kết"
+                title="Sao chép liên kết bài viết"
               >
-                <span className="material-symbols-outlined text-[16px]">share</span>
+                <span className="material-symbols-outlined text-[16px]">
+                  {copiedNotification ? 'check' : 'share'}
+                </span>
                 <span>{copiedNotification ? 'Đã sao chép!' : 'Chia sẻ'}</span>
               </button>
 
               <button
                 onClick={() => handleConsultClick()}
-                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white shadow-md transition-all"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white shadow-md transition-all cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[16px]">support_agent</span>
-                <span>Tư Vấn Miễn Phí</span>
+                <span>Tư Vấn 1:1</span>
               </button>
             </div>
           </div>
@@ -111,27 +187,27 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
           {/* Article Header */}
           <div className="mb-8">
             <div className="flex flex-wrap items-center gap-2.5 mb-4">
-              <span className="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wide bg-blue-500/20 text-[#4cd7f6] border border-blue-500/30">
+              <span className="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wide bg-blue-500/15 text-blue-600 dark:text-[#4cd7f6] border border-blue-500/30">
                 {selectedArticle.category}
               </span>
               <span className="flex items-center gap-1 text-xs text-slate-400">
                 <span className="material-symbols-outlined text-[14px]">calendar_today</span>
                 {selectedArticle.date}
               </span>
-              <span className="text-slate-500">•</span>
+              <span className="text-slate-400">•</span>
               <span className="flex items-center gap-1 text-xs text-slate-400">
                 <span className="material-symbols-outlined text-[14px]">schedule</span>
                 {selectedArticle.readTime}
               </span>
             </div>
 
-            <h1 className={`text-2xl sm:text-4xl font-extrabold leading-tight mb-4 ${
+            <h1 className={`text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight mb-4 ${
               isDark ? 'text-white' : 'text-slate-900'
             }`}>
               {selectedArticle.title}
             </h1>
 
-            <p className={`text-base sm:text-lg leading-relaxed font-medium p-4 rounded-xl mb-6 ${
+            <p className={`text-sm sm:text-base leading-relaxed font-medium p-4 rounded-xl mb-6 ${
               isDark ? 'bg-[#0d1c32] text-cyan-200 border-l-4 border-cyan-400' : 'bg-blue-50 text-blue-900 border-l-4 border-blue-600'
             }`}>
               {selectedArticle.summary}
@@ -145,7 +221,10 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
                 <img
                   src={selectedArticle.author.avatar}
                   alt={selectedArticle.author.name}
-                  className="w-12 h-12 rounded-full object-cover border-2 border-blue-400/40"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80';
+                  }}
+                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-blue-400/40 shrink-0"
                 />
                 <div>
                   <div className="flex items-center gap-1.5">
@@ -161,34 +240,37 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
           </div>
 
           {/* Featured Image */}
-          <div className="relative rounded-2xl overflow-hidden mb-10 shadow-2xl border border-white/10 aspect-video max-h-[460px]">
+          <div className="relative rounded-2xl overflow-hidden mb-8 shadow-xl border border-slate-200 dark:border-white/10 aspect-video max-h-[440px] bg-slate-900">
             <img
               src={selectedArticle.imageUrl}
               alt={selectedArticle.title}
+              onError={(e) => {
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80';
+              }}
               className="w-full h-full object-cover"
             />
           </div>
 
-          {/* Key Metrics Dashboard Bar */}
+          {/* Quick Metrics Dashboard Bar */}
           {selectedArticle.keyStats && selectedArticle.keyStats.length > 0 && (
-            <div className="mb-10">
+            <div className="mb-8">
               <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${
                 isDark ? 'text-cyan-400' : 'text-blue-600'
               }`}>
                 Thông Số Nhanh Về Chương Trình
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
                 {selectedArticle.keyStats.map((stat, idx) => (
                   <div
                     key={idx}
-                    className={`p-4 rounded-xl border text-center transition-all ${
+                    className={`p-3 sm:p-4 rounded-xl border text-center transition-all ${
                       isDark
                         ? 'bg-[#0d1c32] border-[#1c2a41] hover:border-cyan-500/30'
                         : 'bg-white border-slate-200 shadow-sm hover:border-blue-300'
                     }`}
                   >
-                    <span className="block text-xs text-slate-400 mb-1">{stat.label}</span>
-                    <span className={`text-sm sm:text-base font-extrabold ${
+                    <span className="block text-[11px] sm:text-xs text-slate-400 mb-1">{stat.label}</span>
+                    <span className={`text-xs sm:text-sm md:text-base font-extrabold ${
                       isDark ? 'text-white' : 'text-slate-900'
                     }`}>
                       {stat.value}
@@ -199,26 +281,63 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
             </div>
           )}
 
+          {/* Direct Destination Roadmap Callout Banner */}
+          {relatedRoadmap && onViewRoadmap && (
+            <div className={`mb-8 p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all ${
+              isDark
+                ? 'bg-gradient-to-r from-[#0d1c32] via-[#091b38] to-[#12284c] border-cyan-500/30'
+                : 'bg-gradient-to-r from-blue-50 via-cyan-50 to-indigo-50 border-blue-200'
+            }`}>
+              <div className="flex items-center gap-3.5">
+                <span className="text-3xl">{relatedRoadmap.flag}</span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
+                      Lộ Trình Đầy Đủ &amp; Chi Phí
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30">
+                      Chi Tiết 5 Bước
+                    </span>
+                  </div>
+                  <h4 className={`text-sm sm:text-base font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                    Xem Toàn Bộ Lộ Trình &amp; Chi Phí Xuất Cảnh {relatedRoadmap.name}
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    {relatedRoadmap.desc}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => onViewRoadmap(relatedRoadmap.id)}
+                className="shrink-0 w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <span>Mở Màn Hình Lộ Trình</span>
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            </div>
+          )}
+
           {/* Main Article Content Sections */}
-          <div className="space-y-8 text-sm sm:text-base leading-relaxed">
+          <div className="space-y-6 sm:space-y-8 text-sm sm:text-base leading-relaxed">
             {selectedArticle.sections && selectedArticle.sections.length > 0 ? (
               selectedArticle.sections.map((sec, idx) => (
                 <section
                   key={idx}
-                  className={`p-6 sm:p-8 rounded-2xl border transition-all ${
+                  className={`p-5 sm:p-7 rounded-2xl border transition-all ${
                     isDark
-                      ? 'bg-[#0d1c32]/60 border-[#1c2a41]'
+                      ? 'bg-[#0d1c32]/70 border-[#1c2a41]'
                       : 'bg-white border-slate-200 shadow-sm'
                   }`}
                 >
-                  <h2 className={`text-lg sm:text-xl font-bold mb-4 flex items-center gap-2 ${
+                  <h2 className={`text-base sm:text-lg md:text-xl font-bold mb-4 flex items-center gap-2.5 ${
                     isDark ? 'text-cyan-300' : 'text-blue-700'
                   }`}>
-                    <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shrink-0"></span>
                     <span>{sec.heading}</span>
                   </h2>
 
-                  {sec.paragraphs.map((p, pIdx) => (
+                  {(sec.paragraphs || []).map((p, pIdx) => (
                     <p key={pIdx} className={`mb-3.5 last:mb-0 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                       {p}
                     </p>
@@ -265,8 +384,8 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
 
           {/* Tags Cloud */}
           {selectedArticle.tags && selectedArticle.tags.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 mt-8 pt-6 border-t border-white/10">
-              <span className="text-xs font-bold text-slate-400 mr-2 flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-2 mt-8 pt-6 border-t border-slate-200 dark:border-white/10">
+              <span className="text-xs font-bold text-slate-400 mr-1 flex items-center gap-1">
                 <span className="material-symbols-outlined text-[16px]">tag</span>
                 Thẻ từ khóa:
               </span>
@@ -274,7 +393,7 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
                 <span
                   key={tIdx}
                   className={`px-3 py-1 rounded-lg text-xs font-medium ${
-                    isDark ? 'bg-[#0d1c32] text-slate-300 border border-white/5' : 'bg-slate-100 text-slate-700'
+                    isDark ? 'bg-[#0d1c32] text-slate-300 border border-white/5' : 'bg-slate-100 text-slate-700 border border-slate-200'
                   }`}
                 >
                   #{tag}
@@ -284,7 +403,7 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
           )}
 
           {/* Interactive Consultation Banner */}
-          <div className="mt-12 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 text-white shadow-2xl relative overflow-hidden">
+          <div className="mt-10 p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 text-white shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 -mt-8 -mr-8 w-48 h-48 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none"></div>
             <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
               <div className="max-w-xl">
@@ -302,7 +421,7 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full sm:w-auto">
                 <button
                   onClick={() => handleConsultClick()}
-                  className="px-6 py-3.5 rounded-xl bg-white text-blue-900 hover:bg-blue-50 font-black text-sm shadow-xl transition-all text-center flex items-center justify-center gap-2"
+                  className="px-6 py-3.5 rounded-xl bg-white text-blue-900 hover:bg-blue-50 font-black text-sm shadow-xl transition-all text-center flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[18px]">edit_document</span>
                   <span>Đăng Ký Thẩm Định 1:1</span>
@@ -320,24 +439,24 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
 
           {/* Related Articles Section */}
           {relatedArticles.length > 0 && (
-            <div className="mt-16 pt-10 border-t border-white/10">
+            <div className="mt-14 pt-8 border-t border-slate-200 dark:border-white/10">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  <h3 className={`text-lg sm:text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                     Bài Viết Cùng Chủ Đề
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1">Cập nhật xu hướng và cơ hội xuất cảnh mới nhất</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Cập nhật xu hướng và cơ hội xuất cảnh mới nhất</p>
                 </div>
                 <button
                   onClick={handleBackToList}
-                  className="text-xs font-bold text-cyan-400 hover:underline flex items-center gap-1"
+                  className="text-xs font-bold text-blue-600 dark:text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <span>Xem tất cả</span>
                   <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
                 {relatedArticles.map((rel) => (
                   <div
                     key={rel.id}
@@ -349,10 +468,13 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
                     }`}
                   >
                     <div>
-                      <div className="h-40 overflow-hidden relative">
+                      <div className="h-36 sm:h-40 overflow-hidden relative">
                         <img
                           src={rel.imageUrl}
                           alt={rel.title}
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80';
+                          }}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                         <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-md bg-black/70 text-[10px] font-bold text-cyan-300 backdrop-blur-sm">
@@ -361,19 +483,19 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
                       </div>
                       <div className="p-4">
                         <span className="text-[11px] text-slate-400 block mb-1">{rel.date}</span>
-                        <h4 className={`text-sm font-bold line-clamp-2 mb-2 group-hover:text-cyan-400 transition-colors ${
+                        <h4 className={`text-xs sm:text-sm font-bold line-clamp-2 mb-2 group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors ${
                           isDark ? 'text-white' : 'text-slate-900'
                         }`}>
                           {rel.title}
                         </h4>
-                        <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
                           {rel.summary}
                         </p>
                       </div>
                     </div>
 
                     <div className="p-4 pt-0">
-                      <span className="text-xs font-bold text-cyan-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                      <span className="text-xs font-bold text-blue-600 dark:text-cyan-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                         <span>Đọc tiếp</span>
                         <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                       </span>
@@ -545,7 +667,9 @@ export const NewsView: React.FC<NewsViewProps> = ({ onOpenConsultModal, onNaviga
             <span className="material-symbols-outlined text-5xl text-slate-500 mb-3">
               search_off
             </span>
-            <h3 className="text-lg font-bold text-white mb-1">Không tìm thấy bài viết phù hợp</h3>
+            <h3 className={`text-lg font-bold mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              Không tìm thấy bài viết phù hợp
+            </h3>
             <p className="text-xs text-slate-400 mb-4">
               Vui lòng thử tìm với từ khóa khác hoặc xóa bộ lọc để xem tất cả bài viết.
             </p>

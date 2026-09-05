@@ -125,14 +125,14 @@ export const DestinationDetailModal: React.FC<DestinationDetailModalProps> = ({
         </div>
 
         {/* Modal Footer Actions */}
-        <div className="p-4 sm:p-6 bg-[#041329] border-t border-[#1c2a41] flex flex-wrap items-center justify-between gap-3">
+        <div className="p-4 sm:p-6 bg-[#041329] border-t border-[#1c2a41] flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2.5 rounded-lg bg-[#112036] hover:bg-[#1c2a41] text-[#c3c6d7] text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+            className="px-4 py-2.5 rounded-lg bg-[#112036] hover:bg-[#1c2a41] text-[#c3c6d7] text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center"
           >
             Đóng
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             {onViewRoadmap && (
               <button
                 onClick={() => {
@@ -140,9 +140,9 @@ export const DestinationDetailModal: React.FC<DestinationDetailModalProps> = ({
                   onClose();
                   onViewRoadmap(id);
                 }}
-                className="px-4 py-2.5 rounded-lg bg-[#010e24] hover:bg-[#112036] text-[#4cd7f6] border border-[#4cd7f6]/40 text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2.5 rounded-lg bg-[#010e24] hover:bg-[#112036] text-[#4cd7f6] border border-[#4cd7f6]/40 text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px]"
               >
-                <span>Xem Lộ Trình Chi Tiết (Màn Hình Riêng)</span>
+                <span>Xem Lộ Trình Chi Tiết</span>
                 <span className="material-symbols-outlined text-[16px]">open_in_new</span>
               </button>
             )}
@@ -152,7 +152,7 @@ export const DestinationDetailModal: React.FC<DestinationDetailModalProps> = ({
                 onClose();
                 onConsult(`Du học ${country}`);
               }}
-              className="px-5 py-2.5 rounded-lg bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold transition-all shadow-[0_4px_16px_rgba(37,99,235,0.4)] flex items-center gap-1.5 cursor-pointer"
+              className="px-5 py-2.5 rounded-lg bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs sm:text-sm font-bold transition-all shadow-[0_4px_16px_rgba(37,99,235,0.4)] flex items-center justify-center gap-1.5 cursor-pointer min-h-[40px]"
             >
               <span>Đăng Ký Tư Vấn 1:1</span>
               <span className="material-symbols-outlined text-[16px]">arrow_forward</span>

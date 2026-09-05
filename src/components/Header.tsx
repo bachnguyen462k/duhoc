@@ -53,16 +53,16 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/* Right CTA Actions */}
-        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Theme Toggle Button (Light / Dark Mode) */}
           <button
             onClick={toggleTheme}
-            className="w-8 h-8 rounded-lg border flex items-center justify-center transition-all cursor-pointer bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 dark:bg-[#0d1c32] dark:hover:bg-[#1c2a41] dark:border-[#1c2a41] dark:text-[#ffb95f]"
+            className="w-10 h-10 sm:w-9 sm:h-9 rounded-xl border flex items-center justify-center transition-all cursor-pointer bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 dark:bg-[#0d1c32] dark:hover:bg-[#1c2a41] dark:border-[#1c2a41] dark:text-[#ffb95f]"
             title={isDark ? 'Chuyển sang Giao diện Sáng (Light Mode)' : 'Chuyển sang Giao diện Tối (Dark Mode)'}
             aria-label="Toggle dark/light theme"
             id="theme-toggle-btn"
           >
-            <span className="material-symbols-outlined text-[18px]">
+            <span className="material-symbols-outlined text-[19px]">
               {isDark ? 'light_mode' : 'dark_mode'}
             </span>
           </button>
@@ -93,26 +93,27 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Consultation CTA */}
           <button
             onClick={onOpenConsultModal}
-            className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white dark:bg-[#2563eb] dark:hover:bg-[#1d4ed8] text-[13px] font-bold transition-all shadow-[0_2px_10px_rgba(37,99,235,0.3)] dark:shadow-[0_4px_16px_rgba(37,99,235,0.4)] cursor-pointer whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white dark:bg-[#2563eb] dark:hover:bg-[#1d4ed8] text-xs sm:text-[13px] font-bold transition-all shadow-[0_2px_10px_rgba(37,99,235,0.3)] dark:shadow-[0_4px_16px_rgba(37,99,235,0.4)] cursor-pointer whitespace-nowrap min-h-[40px] sm:min-h-[36px]"
             id="register-consultation-btn"
           >
-            <span className="material-symbols-outlined text-[16px]">contact_phone</span>
-            <span>Đăng Ký Tư Vấn 1:1</span>
+            <span className="material-symbols-outlined text-[16px] sm:text-[18px]">contact_phone</span>
+            <span className="hidden sm:inline">Đăng Ký Tư Vấn 1:1</span>
+            <span className="sm:hidden">Tư Vấn 1:1</span>
           </button>
 
-          {/* User Profile Avatar Icon */}
+          {/* User Profile Avatar Icon (desktop/tablet) */}
           <div
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 dark:bg-[#2563eb]/30 dark:border-[#4cd7f6]/40 dark:text-[#b4c5ff] dark:hover:text-white flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+            className="hidden sm:flex w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 dark:bg-[#2563eb]/30 dark:border-[#4cd7f6]/40 dark:text-[#b4c5ff] dark:hover:text-white items-center justify-center shrink-0 cursor-pointer transition-colors"
             title="Tài khoản học viên / người lao động"
             id="user-profile-badge"
           >
             <span className="material-symbols-outlined text-[18px]">person</span>
           </div>
 
-          {/* Mobile Hamburger Toggle */}
+          {/* Mobile Hamburger Toggle (44px touch target) */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-slate-700 dark:text-[#d6e3ff] hover:text-slate-900 dark:hover:text-white focus:outline-none"
+            className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl text-slate-700 dark:text-[#d6e3ff] hover:bg-slate-100 dark:hover:bg-[#112036] focus:outline-none cursor-pointer"
             aria-label="Toggle Menu"
             id="mobile-menu-toggle"
           >
@@ -123,10 +124,10 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Lower Tier: Dedicated Full-Width Navigation Menu Bar (Text is strictly on 1 line) */}
-      <div className="w-full border-t border-slate-200/80 dark:border-[#1c2a41]/80 bg-slate-50/90 dark:bg-[#020d1c]/90 backdrop-blur-md">
+      {/* Lower Tier: Dedicated Full-Width Navigation Menu Bar (Desktop & Tablet) */}
+      <div className="hidden md:block w-full border-t border-slate-200/80 dark:border-[#1c2a41]/80 bg-slate-50/90 dark:bg-[#020d1c]/90 backdrop-blur-md">
         <div className="h-11 w-full px-4 sm:px-6 max-w-[1280px] mx-auto flex items-center justify-between gap-4">
-          {/* Main Desktop & Tablet Navigation Menu - strictly 1 line, horizontal flex */}
+          {/* Main Desktop & Tablet Navigation Menu */}
           <nav
             className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 w-full lg:w-auto"
             id="main-desktop-nav"
@@ -165,7 +166,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white/98 dark:bg-[#0a192f]/98 backdrop-blur-2xl border-b border-slate-200 dark:border-[#1c2a41] px-4 py-4 space-y-2 shadow-xl">
+        <div className="md:hidden bg-white/98 dark:bg-[#0a192f]/98 backdrop-blur-2xl border-b border-slate-200 dark:border-[#1c2a41] px-4 py-4 space-y-2 shadow-2xl animate-fadeIn">
           {navItems.map((item) => (
             <button
               key={item.id}
@@ -173,47 +174,50 @@ export const Header: React.FC<HeaderProps> = ({
                 setActivePage(item.id);
                 setIsMobileMenuOpen(false);
               }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-[14px] font-semibold flex items-center justify-between ${
+              className={`w-full text-left px-3.5 py-3 rounded-xl text-[14px] font-semibold flex items-center justify-between min-h-[44px] cursor-pointer transition-all ${
                 activePage === item.id
-                  ? 'bg-blue-600 text-white dark:bg-[#2563eb]'
+                  ? 'bg-blue-600 text-white dark:bg-[#2563eb] shadow-md'
                   : 'text-slate-700 hover:bg-slate-100 dark:text-[#c3c6d7] dark:hover:bg-[#112036]'
               }`}
             >
-              <div className="flex items-center gap-2.5">
-                <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                 <span>{item.label}</span>
               </div>
-              <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>
           ))}
-          <div className="pt-3 border-t border-slate-200 dark:border-[#1c2a41] flex flex-col gap-2">
-            <button
-              onClick={toggleTheme}
-              className="w-full py-2.5 rounded-lg border border-slate-200 dark:border-[#1c2a41] bg-slate-100 dark:bg-[#0d1c32] text-slate-800 dark:text-[#ffb95f] text-[13px] font-bold text-center flex items-center justify-center gap-2"
-            >
-              <span className="material-symbols-outlined text-[18px]">
-                {isDark ? 'light_mode' : 'dark_mode'}
-              </span>
-              <span>{isDark ? 'Đổi sang Chế độ Sáng' : 'Đổi sang Chế độ Tối'}</span>
-            </button>
-
-            <a
-              href="tel:19006868"
-              className="flex items-center gap-2 py-2 text-blue-600 dark:text-[#4cd7f6] text-[13px] font-semibold"
-            >
-              <span className="material-symbols-outlined text-[18px]">support_agent</span>
-              <span>Hotline 24/7: 1900 6868</span>
-            </a>
+          <div className="pt-3 border-t border-slate-200 dark:border-[#1c2a41] flex flex-col gap-2.5">
             <button
               onClick={() => {
                 onOpenCalculator();
                 setIsMobileMenuOpen(false);
               }}
-              className="w-full py-2.5 rounded-lg bg-blue-50 dark:bg-[#1c2a41] text-blue-700 dark:text-[#4cd7f6] text-[13px] font-bold text-center flex items-center justify-center gap-1.5"
+              className="w-full py-3 rounded-xl bg-blue-50 dark:bg-[#1c2a41] text-blue-700 dark:text-[#4cd7f6] text-[13px] font-bold text-center flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[18px]">calculate</span>
+              <span className="material-symbols-outlined text-[20px]">calculate</span>
               <span>Dự Đoán Tỷ Lệ Đỗ &amp; Chi Phí</span>
             </button>
+
+            <button
+              onClick={() => {
+                toggleTheme();
+              }}
+              className="w-full py-3 rounded-xl border border-slate-200 dark:border-[#1c2a41] bg-slate-100 dark:bg-[#0d1c32] text-slate-800 dark:text-[#ffb95f] text-[13px] font-bold text-center flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                {isDark ? 'light_mode' : 'dark_mode'}
+              </span>
+              <span>{isDark ? 'Chuyển sang Giao diện Sáng' : 'Chuyển sang Giao diện Tối'}</span>
+            </button>
+
+            <a
+              href="tel:19006868"
+              className="flex items-center justify-center gap-2 py-2.5 text-blue-600 dark:text-[#4cd7f6] text-[13px] font-bold min-h-[44px] rounded-xl hover:bg-blue-50/50 dark:hover:bg-[#112036]/50"
+            >
+              <span className="material-symbols-outlined text-[20px]">support_agent</span>
+              <span>Tổng Đài Hỗ Trợ 24/7: 1900 6868</span>
+            </a>
           </div>
         </div>
       )}

@@ -99,9 +99,9 @@ export const DestinationsSection: React.FC<DestinationsSectionProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-black/30" />
 
                 {/* Top Badges */}
-                <div className="relative z-10 p-6 flex justify-between items-start">
+                <div className="relative z-10 p-4 sm:p-6 flex justify-between items-start">
                   <div
-                    className={`px-3 py-1 rounded-full backdrop-blur-md text-xs font-bold flex items-center gap-1 border ${
+                    className={`px-2.5 sm:px-3 py-1 rounded-full backdrop-blur-md text-[11px] sm:text-xs font-bold flex items-center gap-1 border ${
                       dest.badgeType === 'gold'
                         ? 'bg-black/60 text-[#ffb95f] border-[#ffb95f]/40'
                         : 'bg-black/60 text-[#4cd7f6] border-[#4cd7f6]/40'
@@ -112,13 +112,13 @@ export const DestinationsSection: React.FC<DestinationsSectionProps> = ({
                     </span>
                     <span>{dest.highlightBadge}</span>
                   </div>
-                  <span className="px-2.5 py-1 rounded bg-black/60 backdrop-blur-sm text-[#d6e3ff] text-xs font-semibold border border-white/20">
+                  <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded bg-black/60 backdrop-blur-sm text-[#d6e3ff] text-[11px] sm:text-xs font-semibold border border-white/20">
                     {dest.tag}
                   </span>
                 </div>
 
                 {/* Bottom Content Area */}
-                <div className="relative z-10 p-6">
+                <div className="relative z-10 p-4 sm:p-6">
                   <div className="flex items-center gap-2 text-[#4cd7f6] text-xs uppercase font-bold tracking-wider">
                     <span className="text-base">{dest.flag}</span>
                     <span>{dest.name}</span>
@@ -132,35 +132,35 @@ export const DestinationsSection: React.FC<DestinationsSectionProps> = ({
                     {dest.title}
                   </h3>
 
-                  <p className="text-xs sm:text-[13px] text-[#e2e8f0] max-w-xl mb-4 line-clamp-2 leading-relaxed">
+                  <p className="text-xs sm:text-[13px] text-[#e2e8f0] max-w-xl mb-3 sm:mb-4 line-clamp-2 leading-relaxed">
                     {dest.description}
                   </p>
 
                   {/* Highlights Grid */}
                   {isHero ? (
-                    <div className="grid grid-cols-3 gap-2 pt-1 mb-4">
-                      <div className="p-2.5 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
-                        <span className="block text-[11px] text-slate-300">Học bổng tối đa</span>
-                        <span className="text-sm sm:text-base text-[#ffb95f] font-bold">{dest.maxScholarship}</span>
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1 mb-3 sm:mb-4">
+                      <div className="p-2 sm:p-2.5 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
+                        <span className="block text-[10px] sm:text-[11px] text-slate-300">Học bổng tối đa</span>
+                        <span className="text-xs sm:text-base text-[#ffb95f] font-bold">{dest.maxScholarship}</span>
                       </div>
-                      <div className="p-2.5 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
-                        <span className="block text-[11px] text-slate-300">Ở lại làm việc</span>
-                        <span className="text-sm sm:text-base text-[#4cd7f6] font-bold">{dest.postStudyWork}</span>
+                      <div className="p-2 sm:p-2.5 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
+                        <span className="block text-[10px] sm:text-[11px] text-slate-300">Ở lại làm việc</span>
+                        <span className="text-xs sm:text-base text-[#4cd7f6] font-bold">{dest.postStudyWork}</span>
                       </div>
-                      <div className="p-2.5 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
-                        <span className="block text-[11px] text-slate-300">Chi phí TB/Năm</span>
-                        <span className="text-sm sm:text-base text-white font-bold">{dest.avgCost}</span>
+                      <div className="p-2 sm:p-2.5 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10">
+                        <span className="block text-[10px] sm:text-[11px] text-slate-300">Chi phí TB/Năm</span>
+                        <span className="text-xs sm:text-base text-white font-bold">{dest.avgCost}</span>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between pt-1 mb-4 bg-black/60 p-2.5 rounded-lg backdrop-blur-sm border border-white/10">
+                    <div className="flex items-center justify-between pt-1 mb-3 sm:mb-4 bg-black/60 p-2 sm:p-2.5 rounded-lg backdrop-blur-sm border border-white/10">
                       <div>
-                        <span className="block text-[11px] text-slate-300">Học bổng</span>
-                        <span className="text-sm text-[#ffb95f] font-bold">{dest.maxScholarship}</span>
+                        <span className="block text-[10px] sm:text-[11px] text-slate-300">Học bổng</span>
+                        <span className="text-xs sm:text-sm text-[#ffb95f] font-bold">{dest.maxScholarship}</span>
                       </div>
                       <div className="text-right">
-                        <span className="block text-[11px] text-slate-300">Thời gian / Cơ hội</span>
-                        <span className="text-sm text-white font-bold">{dest.postStudyWork}</span>
+                        <span className="block text-[10px] sm:text-[11px] text-slate-300">Thời gian / Cơ hội</span>
+                        <span className="text-xs sm:text-sm text-white font-bold">{dest.postStudyWork}</span>
                       </div>
                     </div>
                   )}

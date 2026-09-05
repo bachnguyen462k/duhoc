@@ -104,19 +104,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           {/* Left Editorial Pillar */}
           <div className="lg:col-span-7 flex flex-col space-y-6">
             {/* Live Status Pill */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/90 dark:bg-[#112036]/80 backdrop-blur-md border border-blue-200 dark:border-[#4cd7f6]/30 shadow-sm dark:shadow-[0_0_20px_-2px_rgba(6,182,212,0.3)] w-max transition-colors">
-              <span className="relative flex h-2.5 w-2.5">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/90 dark:bg-[#112036]/80 backdrop-blur-md border border-blue-200 dark:border-[#4cd7f6]/30 shadow-sm dark:shadow-[0_0_20px_-2px_rgba(6,182,212,0.3)] max-w-full transition-colors">
+              <span className="relative flex h-2.5 w-2.5 shrink-0">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-600 dark:bg-[#4cd7f6] opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600 dark:bg-[#4cd7f6]" />
               </span>
-              <span className="text-[11px] uppercase tracking-widest text-blue-700 dark:text-[#4cd7f6] font-bold flex items-center gap-1.5">
+              <span className="text-[10px] sm:text-[11px] uppercase tracking-wider sm:tracking-widest text-blue-700 dark:text-[#4cd7f6] font-bold flex items-center gap-1.5 line-clamp-1">
                 <span className="material-symbols-outlined text-[14px]">flight_takeoff</span>
-                <span>Tư Vấn Du Học &amp; Xuất Khẩu Lao Động 2025 • Nhật Bản - Hàn Quốc - Đài Loan</span>
+                <span>Tư Vấn Du Học &amp; XKLĐ 2025 • Nhật - Hàn - Đài</span>
               </span>
             </div>
 
             {/* Master Headline */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.12] drop-shadow-sm transition-colors">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-[52px] font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15] drop-shadow-sm transition-colors">
               Chắp Cánh Ước Mơ <br />
               <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-emerald-600 dark:from-white dark:via-[#4cd7f6] dark:to-[#34d399] bg-clip-text text-transparent">
                 Du Học &amp; Xuất Khẩu Lao Động
@@ -126,7 +126,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </h1>
 
             {/* Subheading */}
-            <p className="text-base sm:text-lg text-slate-600 dark:text-[#c3c6d7] max-w-xl leading-relaxed transition-colors">
+            <p className="text-sm sm:text-base lg:text-lg text-slate-600 dark:text-[#c3c6d7] max-w-xl leading-relaxed transition-colors">
               Hệ thống tư vấn &amp; đào tạo ngoại ngữ, tay nghề trọn gói từ{' '}
               <span className="font-bold text-slate-900 dark:text-white">Việt Nam</span>: Kết nối việc làm lương cao{' '}
               <span className="text-emerald-600 dark:text-emerald-400 font-bold">Nhật Bản</span> (Tokutei Ginou 1 &amp; 2, Kỹ sư),{' '}
@@ -135,24 +135,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </p>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3.5 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <button
                 onClick={() => onOpenConsultModal()}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-[#2563eb] dark:hover:bg-[#1d4ed8] text-white font-bold text-[14px] transition-all shadow-[0_4px_16px_rgba(37,99,235,0.35)] dark:shadow-[0_4px_24px_rgba(37,99,235,0.45)] hover:scale-[1.02] cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-[#2563eb] dark:hover:bg-[#1d4ed8] text-white font-bold text-[14px] transition-all shadow-[0_4px_16px_rgba(37,99,235,0.35)] dark:shadow-[0_4px_24px_rgba(37,99,235,0.45)] hover:scale-[1.02] cursor-pointer min-h-[44px]"
                 id="hero-consult-btn"
               >
                 <span className="material-symbols-outlined text-[18px]">contact_phone</span>
                 <span>Tư Vấn Hồ Sơ &amp; Đơn Hàng 1:1</span>
               </button>
 
-              <button
-                onClick={() => onNavigateToCalculator()}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-white/90 hover:bg-slate-100 text-slate-800 border border-slate-200 dark:bg-[#112036]/80 dark:hover:bg-[#1c2a41] dark:text-[#4cd7f6] dark:hover:text-white dark:border-[#4cd7f6]/30 backdrop-blur-md transition-all font-semibold text-[14px] shadow-sm dark:shadow-[0_0_16px_rgba(6,182,212,0.15)] cursor-pointer"
-                id="hero-calculator-btn"
-              >
-                <span className="material-symbols-outlined text-[18px]">calculate</span>
-                <span>Dự Đoán Tỷ Lệ Đỗ &amp; Chi Phí</span>
-              </button>
+            
             </div>
 
             {/* East Asia Route Focus Indicator */}

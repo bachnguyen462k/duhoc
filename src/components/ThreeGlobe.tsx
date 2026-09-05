@@ -99,7 +99,18 @@ export const ThreeGlobe: React.FC<ThreeGlobeProps> = ({ focusedCountry = 'japan'
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.set(0, 1.2, 8.2);
+    
+    // Adaptive camera placement for mobile vs desktop screens
+    const updateCameraForViewport = (w: number) => {
+      if (w < 640) {
+        camera.position.set(0, 1.4, 9.8);
+      } else if (w < 1024) {
+        camera.position.set(0, 1.3, 8.8);
+      } else {
+        camera.position.set(0, 1.2, 8.2);
+      }
+    };
+    updateCameraForViewport(width);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -854,6 +865,7 @@ export const ThreeGlobe: React.FC<ThreeGlobeProps> = ({ focusedCountry = 'japan'
       const newW = container.clientWidth || window.innerWidth;
       const newH = container.clientHeight || window.innerHeight;
       camera.aspect = newW / newH;
+      updateCameraForViewport(newW);
       camera.updateProjectionMatrix();
       renderer.setSize(newW, newH);
     };
@@ -870,7 +882,7 @@ export const ThreeGlobe: React.FC<ThreeGlobeProps> = ({ focusedCountry = 'japan'
   }, [isDark]);
 
   return (
-    <div className="w-full h-full absolute inset-0 pointer-events-auto select-none" id="threejs-globe-canvas">
+    <div className="w-full h-full absolute inset-0 pointer-events-auto select-none touch-pan-y" id="threejs-globe-canvas">
       <div ref={containerRef} className="w-full h-full" />
     </div>
   );

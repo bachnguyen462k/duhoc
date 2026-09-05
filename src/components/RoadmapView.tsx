@@ -98,10 +98,10 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
 
         {/* View Mode Switcher: By Country vs By EduGlobal 5 Steps */}
         <div className="flex justify-center mb-8">
-          <div className="inline-flex p-1.5 rounded-xl bg-white dark:bg-[#0d1c32] border border-slate-200 dark:border-[#1c2a41] shadow-sm">
+          <div className="w-full sm:w-auto grid grid-cols-1 sm:flex p-1 sm:p-1.5 rounded-xl bg-white dark:bg-[#0d1c32] border border-slate-200 dark:border-[#1c2a41] shadow-sm gap-1">
             <button
               onClick={() => setViewMode('country')}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-2 px-3 sm:px-6 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 viewMode === 'country'
                   ? 'bg-blue-600 text-white shadow-md dark:bg-[#2563eb] dark:shadow-[0_0_15px_rgba(37,99,235,0.4)]'
                   : 'text-slate-600 hover:text-slate-900 dark:text-[#8d90a0] dark:hover:text-white'
@@ -112,7 +112,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
             </button>
             <button
               onClick={() => setViewMode('methodology')}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-2 px-3 sm:px-6 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 viewMode === 'methodology'
                   ? 'bg-blue-600 text-white shadow-md dark:bg-[#2563eb] dark:shadow-[0_0_15px_rgba(37,99,235,0.4)]'
                   : 'text-slate-600 hover:text-slate-900 dark:text-[#8d90a0] dark:hover:text-white'
@@ -293,14 +293,17 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
               </div>
 
               {/* Phase Step Selectors */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-2.5">
                 {currentCountry.phases.map((phase, idx) => {
                   const isActive = idx === activePhaseIndex;
+                  const isLastOdd = idx === 4;
                   return (
                     <button
                       key={phase.phaseNumber}
                       onClick={() => setActivePhaseIndex(idx)}
-                      className={`p-3.5 rounded-xl text-left transition-all cursor-pointer border flex flex-col justify-between min-h-[95px] ${
+                      className={`${
+                        isLastOdd ? 'col-span-2 sm:col-span-1' : ''
+                      } p-3 sm:p-3.5 rounded-xl text-left transition-all cursor-pointer border flex flex-col justify-between min-h-[90px] sm:min-h-[95px] ${
                         isActive
                           ? 'bg-blue-600 text-white dark:bg-[#2563eb] border-blue-600 dark:border-[#4cd7f6] shadow-lg dark:shadow-[0_0_15px_rgba(76,215,246,0.3)]'
                           : 'bg-white dark:bg-[#0d1c32] text-slate-700 dark:text-[#c3c6d7] border-slate-200 dark:border-[#1c2a41] hover:border-blue-400 dark:hover:border-[#4cd7f6]/40'
@@ -308,7 +311,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
                     >
                       <div className="flex items-center justify-between">
                         <span
-                          className={`text-xs font-black uppercase tracking-wider ${
+                          className={`text-[11px] sm:text-xs font-black uppercase tracking-wider ${
                             isActive ? 'text-white' : 'text-blue-600 dark:text-[#4cd7f6]'
                           }`}
                         >
@@ -430,13 +433,13 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
                     </div>
 
                     {/* Milestone Callout */}
-                    <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-[#010e24] dark:to-[#091830] border border-blue-200 dark:border-[#2563eb]/40 flex items-center justify-between gap-4">
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-[#010e24] dark:to-[#091830] border border-blue-200 dark:border-[#2563eb]/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-600 dark:bg-[#2563eb] text-white flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-blue-600 dark:bg-[#2563eb] text-white flex items-center justify-center shrink-0 shadow-md">
                           <span className="material-symbols-outlined text-[20px]">emoji_events</span>
                         </div>
                         <div>
-                          <span className="text-[11px] font-bold text-blue-600 dark:text-[#4cd7f6] uppercase">
+                          <span className="text-[10px] sm:text-[11px] font-bold text-blue-600 dark:text-[#4cd7f6] uppercase">
                             Cột Mốc Hoàn Thành Giai Đoạn {phase.phaseNumber}
                           </span>
                           <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
@@ -445,11 +448,11 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-blue-200/50 dark:border-[#1c2a41]">
                         {activePhaseIndex > 0 && (
                           <button
                             onClick={() => setActivePhaseIndex((prev) => Math.max(0, prev - 1))}
-                            className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#0d1c32] border border-slate-200 dark:border-[#1c2a41] text-xs font-semibold hover:bg-slate-100 text-slate-700 dark:text-slate-300 transition-colors"
+                            className="flex-1 sm:flex-initial px-3 py-2 sm:py-1.5 rounded-lg bg-white dark:bg-[#0d1c32] border border-slate-200 dark:border-[#1c2a41] text-xs font-semibold hover:bg-slate-100 text-slate-700 dark:text-slate-300 transition-colors text-center cursor-pointer min-h-[36px]"
                           >
                             ← Giai Đoạn Trước
                           </button>
@@ -457,7 +460,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
                         {activePhaseIndex < currentCountry.phases.length - 1 && (
                           <button
                             onClick={() => setActivePhaseIndex((prev) => Math.min(currentCountry.phases.length - 1, prev + 1))}
-                            className="px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors"
+                            className="flex-1 sm:flex-initial px-3.5 py-2 sm:py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors text-center cursor-pointer min-h-[36px]"
                           >
                             Giai Đoạn Kế Tiếp →
                           </button>

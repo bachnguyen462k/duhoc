@@ -46,22 +46,22 @@ export const ConsultModal: React.FC<ConsultModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="w-full max-w-xl rounded-2xl bg-[#0d1c32] border border-[#4cd7f6]/40 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+      <div className="w-full max-w-xl max-h-[92vh] flex flex-col rounded-2xl bg-[#0d1c32] border border-[#4cd7f6]/40 shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="p-5 sm:p-6 bg-[#041329] border-b border-[#1c2a41] flex items-center justify-between">
+        <div className="p-4 sm:p-6 bg-[#041329] border-b border-[#1c2a41] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-[#2563eb]/20 border border-[#2563eb]/40 flex items-center justify-center text-[#4cd7f6]">
+            <div className="w-9 h-9 rounded-lg bg-[#2563eb]/20 border border-[#2563eb]/40 flex items-center justify-center text-[#4cd7f6] shrink-0">
               <span className="material-symbols-outlined text-[20px]">school</span>
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-bold text-white">Đăng Ký Tư Vấn Lộ Trình 1:1</h3>
-              <p className="text-xs text-[#4cd7f6]">{initialTopic}</p>
+              <p className="text-xs text-[#4cd7f6] line-clamp-1">{initialTopic}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8d90a0] hover:text-white hover:bg-[#1c2a41] transition-colors"
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-[#8d90a0] hover:text-white hover:bg-[#1c2a41] transition-colors cursor-pointer"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
           </button>
@@ -69,7 +69,7 @@ export const ConsultModal: React.FC<ConsultModalProps> = ({
 
         {/* Content */}
         {isSuccess ? (
-          <div className="p-8 text-center space-y-4">
+          <div className="p-6 sm:p-8 text-center space-y-4 overflow-y-auto flex-1">
             <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto">
               <span className="material-symbols-outlined text-3xl">check_circle</span>
             </div>
@@ -88,7 +88,7 @@ export const ConsultModal: React.FC<ConsultModalProps> = ({
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="space-y-1">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-[#8d90a0]">

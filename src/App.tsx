@@ -27,6 +27,7 @@ function AppContent() {
   const [consultModalTopic, setConsultModalTopic] = useState('Tư Vấn Học Bổng 1:1');
   const [selectedDestination, setSelectedDestination] = useState<Destination | null>(null);
   const [selectedDestinationForRoadmap, setSelectedDestinationForRoadmap] = useState<string>('japan');
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [calculatorCriteria, setCalculatorCriteria] = useState<{
     country: string;
     degree: string;
@@ -76,6 +77,9 @@ function AppContent() {
       <Header
         activePage={activePage}
         setActivePage={(page) => {
+          if (page === 'news') {
+            setSelectedArticleId(null);
+          }
           setActivePage(page);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
@@ -159,11 +163,13 @@ function AppContent() {
 
         {activePage === 'news' && (
           <NewsView
+            initialArticleId={selectedArticleId}
             onOpenConsultModal={handleOpenConsultModal}
             onNavigateHome={() => {
               setActivePage('home');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
+            onViewRoadmap={handleViewRoadmapDetail}
           />
         )}
       </main>
@@ -171,6 +177,9 @@ function AppContent() {
       {/* Footer */}
       <Footer
         setActivePage={(page) => {
+          if (page === 'news') {
+            setSelectedArticleId(null);
+          }
           setActivePage(page);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
