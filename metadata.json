@@ -1,0 +1,7 @@
+{
+  "name": "EduGlobal - Du Học & Xuất Khẩu Lao Động Nhật Bản • Hàn Quốc • Đài Loan",
+  "description": "Nền tảng tư vấn du học và xuất khẩu lao động (XKLĐ Tokutei, Kỹ sư, EPS, Du học nghề) uy tín từ Việt Nam sang Nhật Bản, Hàn Quốc và Đài Loan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
